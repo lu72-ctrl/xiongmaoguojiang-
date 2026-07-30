@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>熊猫过江双组PK赛 - Panda PK Battle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Noto Sans SC', 'Tajawal', sans-serif;
+            background-color: #091e18;
+            background-image: radial-gradient(circle at 50% 20%, rgba(212, 175, 55, 0.1) 0%, transparent 60%);
+            min-height: 100vh;
+            user-select: none;
+            transition: background-color 0.5s ease;
+        }
+
+        .team1-active { background-color: #091e18; }
+        .team2-active { background-color: #1e0909; }
+
+        .arabesque-border {
+            border: 3px solid #d4af37;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .gold-text {
+            background: linear-gradient(135deg, #FFF099 0%, #D4AF37 50%, #AA7C11 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes pandaJump {
+            0% { transform: scale(1) translateY(0); }
+            40% { transform: scale(1.1) translateY(-40px) rotate(-5deg); }
+            100% { transform: scale(1) translateY(0) rotate(0deg); }
+        }
+        .animate-jump { animation: pandaJump 0.45s ease-out; }
+
+        .panda-transition {
+            transition: left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.4s ease-out;
+        }
+
+        .lotus-float {
+            animation: float 3s infinite ease-in-out;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .word-tile {
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .word-tile:hover { transform: translateY(-3px) scale(1.05); }
+    </style>
+</head>
+<body class="text-slate-100 flex flex-col min-h-screen team1-active">
+
+    <!-- Header -->
+    <header class="w-full bg-black/40 backdrop-blur border-b border-amber-500/30 px-4 py-3 sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                <div class="w-10 h-10 rounded-full bg-amber-500/20 border border-amber-400 flex items-center justify-center text-2xl shadow-lg">🐼</div>
+                <div>
+                    <h1 class="text-lg md:text-xl font-bold gold-text tracking-wide">
+                        <ruby>熊<rt>xióng</rt></ruby><ruby>猫<rt>māo</rt></ruby><ruby>过<rt>guò</rt></ruby><ruby>江<rt>jiāng</rt></ruby> · <ruby>现<rt>xiàn</rt></ruby><ruby>场<rt>chǎng</rt></ruby>PK
+                    </h1>
+                    <p class="text-[10px] text-amber-200/80 uppercase tracking-tighter">Panda Battle: Group 1 vs Group 2</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <div id="pkBadge" class="hidden px-3 py-1 rounded-full bg-red-600 text-white text-[10px] font-bold animate-pulse uppercase">PK Mode</div>
+                <div id="gameTimer" class="hidden px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 text-sm font-mono font-bold">
+                    ⏱️ <span id="timerVal">00:00</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-5xl w-full mx-auto p-3 flex flex-col justify-center">
+
+        <!-- SCREEN 1: PK SETUP -->
+        <section id="setupScreen" class="bg-emerald-900/40 backdrop-blur-md arabesque-border rounded-3xl p-6 md:p-10 max-w-2xl mx-auto w-full text-center shadow-2xl relative">
+            <div class="mb-6">
+                <span class="text-6xl">⚔️</span>
+                <h2 class="text-3xl font-black text-amber-300 mt-4">
+                    <ruby>小<rt>xiǎo</rt></ruby><ruby>组<rt>zǔ</rt></ruby><ruby>对<rt>duì</rt></ruby><ruby>抗<rt>kàng</rt></ruby><ruby>赛<rt>sài</rt></ruby>
+                </h2>
+                <p class="text-sm text-emerald-200">Group PK Battle | معركة المجموعات</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <!-- Group 1 Box -->
+                <div class="bg-emerald-950/80 p-5 rounded-2xl border-2 border-emerald-500 shadow-xl">
+                    <div class="text-4xl mb-2">🎋</div>
+                    <h3 class="text-xl font-bold text-emerald-400"><ruby>小<rt>xiǎo</rt></ruby><ruby>组<rt>zǔ</rt></ruby><ruby>一<rt>yī</rt></ruby></h3>
+                    <p class="text-[10px] text-emerald-500">Group One / المجموعة الأولى</p>
+                </div>
+                <!-- Group 2 Box -->
+                <div class="bg-red-950/40 p-5 rounded-2xl border-2 border-red-500 shadow-xl">
+                    <div class="text-4xl mb-2">🥋</div>
+                    <h3 class="text-xl font-bold text-red-400"><ruby>小<rt>xiǎo</rt></ruby><ruby>组<rt>zǔ</rt></ruby><ruby>二<rt>èr</rt></ruby></h3>
+                    <p class="text-[10px] text-red-500">Group Two / المجموعة الثانية</p>
+                </div>
+            </div>
+
+            <button onclick="startPK()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-600 text-emerald-950 font-black text-xl shadow-xl hover:scale-105 transition transform active:scale-95">
+                ⚔️ <ruby>开<rt>kāi</rt></ruby><ruby>始<rt>shǐ</rt></ruby>PK <ruby>对<rt>duì</rt></ruby><ruby>战<rt>zhàn</rt></ruby> START BATTLE
+            </button>
+        </section>
+
+        <!-- SCREEN 2: INTERMISSION / TRANSITION -->
+        <section id="transitionScreen" class="hidden text-center p-10 bg-black/60 backdrop-blur rounded-3xl arabesque-border max-w-xl mx-auto w-full">
+            <div id="transitionIcon" class="text-7xl mb-6">📢</div>
+            <h2 id="transitionTitle" class="text-3xl font-bold text-amber-300 mb-4">小组一已完成！</h2>
+            <p id="transitionText" class="text-lg text-emerald-100 mb-8">请小组二准备好过江...</p>
+            <button onclick="nextTeamTurn()" class="px-10 py-4 bg-amber-500 text-black font-black rounded-xl text-xl animate-bounce">
+                下一步 Next Step
+            </button>
+        </section>
+
+        <!-- SCREEN 3: GAME PLAY AREA -->
+        <section id="gameArea" class="hidden flex-col gap-4">
+            <!-- Team Info Bar -->
+            <div id="teamTurnIndicator" class="flex justify-between items-center bg-emerald-900 border-2 border-emerald-500 rounded-2xl px-6 py-3 shadow-lg">
+                <div class="flex items-center gap-3">
+                    <span id="curTeamAvatar" class="text-3xl">🎋</span>
+                    <div class="text-left">
+                        <div class="text-[10px] uppercase text-emerald-400 font-bold tracking-widest">Current Turn</div>
+                        <div id="curTeamName" class="text-xl font-black text-white">小组一</div>
+                    </div>
+                </div>
+                <div class="bg-black/30 px-4 py-1 rounded-full border border-white/20">
+                    <span class="text-xs text-emerald-300 font-bold">Round</span>
+                    <span id="roundCount" class="text-2xl font-black text-amber-400 ml-1">1</span>
+                </div>
+            </div>
+
+            <!-- River Scene -->
+            <div class="bg-gradient-to-b from-blue-950 via-teal-900 to-blue-950 border-2 border-amber-500/40 rounded-3xl p-4 relative overflow-hidden min-h-[200px] shadow-2xl flex flex-col justify-center">
+                <div id="riverTrack" class="relative z-10 flex justify-between items-center px-10">
+                    <!-- Stones dynamically added -->
+                </div>
+                
+                <!-- Animated Panda -->
+                <div id="pandaMascot" class="absolute z-20 panda-transition flex flex-col items-center" style="left: 20px; top: 70px;">
+                    <div id="pandaEmoji" class="text-5xl filter drop-shadow-md">🐼</div>
+                    <div id="pandaBubble" class="bg-white text-black text-[10px] px-2 py-0.5 rounded-full font-bold mt-1 opacity-90 shadow-sm">
+                        <ruby>加油<rt>jiā yóu</rt></ruby>!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question/Hint -->
+            <div class="bg-black/40 border border-white/10 rounded-2xl p-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="text-left rtl:text-right">
+                    <div class="text-amber-400 text-xs font-bold mb-1">💡 <ruby>提示<rt>tí shì</rt></ruby> Hint / تلميح:</div>
+                    <div id="hintEn" class="text-white font-medium italic text-sm">--</div>
+                    <div id="hintAr" dir="rtl" class="text-amber-200 text-xs mt-1">--</div>
+                </div>
+                <button onclick="playTTS()" class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl border border-white/20 text-xs transition">
+                    🔊 <ruby>听读音<rt>tīng dú yīn</rt></ruby> Listen
+                </button>
+            </div>
+
+            <!-- Sentence Construction -->
+            <div class="bg-black/20 border-2 border-dashed border-white/20 rounded-3xl p-6 min-h-[120px] flex flex-wrap justify-center items-center gap-3 shadow-inner" id="dropZone">
+                <!-- User built sentence -->
+            </div>
+
+            <!-- Word Pool -->
+            <div class="bg-black/40 rounded-3xl p-6 flex flex-wrap justify-center items-center gap-3 shadow-xl" id="wordPool">
+                <!-- Shuffled word tiles -->
+            </div>
+
+            <!-- Control Buttons -->
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="resetRound()" class="py-4 bg-slate-800 rounded-2xl font-bold border border-slate-600 hover:bg-slate-700 transition">
+                    🔄 <ruby>重置<rt>chóng zhì</rt></ruby> RESET
+                </button>
+                <button onclick="checkAnswer()" class="py-4 bg-amber-500 rounded-2xl font-black text-black text-xl shadow-lg hover:scale-105 transition active:scale-95">
+                    ✔️ <ruby>检查<rt>jiǎn chá</rt></ruby> CHECK
+                </button>
+            </div>
+        </section>
+
+        <!-- SCREEN 4: PK FINAL RESULT -->
+        <section id="resultScreen" class="hidden flex-col gap-6 max-w-4xl mx-auto w-full">
+            <div class="text-center">
+                <h2 class="text-4xl font-black gold-text mb-2"><ruby>比<rt>bǐ</rt></ruby><ruby>分<rt>fēn</rt></ruby><ruby>大<rt>dà</rt></ruby><ruby>榜<rt>bǎng</rt></ruby></h2>
+                <p class="text-emerald-200">Final PK Scoreboard | النتائج النهائية</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Group 1 Final Result -->
+                <div id="cardTeam1" class="bg-emerald-950/80 rounded-3xl p-8 arabesque-border text-center shadow-2xl transition">
+                    <div class="text-5xl mb-4">🎋</div>
+                    <h3 class="text-2xl font-black text-emerald-400 mb-4">小组一</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between border-b border-emerald-800 pb-2">
+                            <span>用时 Time</span>
+                            <span id="resTime1" class="font-bold">--</span>
+                        </div>
+                        <div class="flex justify-between border-b border-emerald-800 pb-2">
+                            <span>试错 Attempts</span>
+                            <span id="resTry1" class="font-bold">--</span>
+                        </div>
+                        <div class="text-5xl font-black text-yellow-400 py-4" id="resScore1">0</div>
+                    </div>
+                    <div id="winnerBadge1" class="hidden mt-4 py-2 bg-yellow-500 text-black font-black rounded-lg">👑 WINNER</div>
+                </div>
+
+                <!-- Group 2 Final Result -->
+                <div id="cardTeam2" class="bg-red-950/40 rounded-3xl p-8 border-3 border-red-500 text-center shadow-2xl transition">
+                    <div class="text-5xl mb-4">🥋</div>
+                    <h3 class="text-2xl font-black text-red-400 mb-4">小组二</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between border-b border-red-900 pb-2">
+                            <span>用时 Time</span>
+                            <span id="resTime2" class="font-bold">--</span>
+                        </div>
+                        <div class="flex justify-between border-b border-red-900 pb-2">
+                            <span>试错 Attempts</span>
+                            <span id="resTry2" class="font-bold">--</span>
+                        </div>
+                        <div class="text-5xl font-black text-yellow-400 py-4" id="resScore2">0</div>
+                    </div>
+                    <div id="winnerBadge2" class="hidden mt-4 py-2 bg-yellow-500 text-black font-black rounded-lg">👑 WINNER</div>
+                </div>
+            </div>
+
+            <button onclick="location.reload()" class="w-full py-4 bg-white/10 hover:bg-white/20 rounded-2xl border border-white/20 font-bold transition">
+                🎮 重新开始 PK模式 RESTART PK
+            </button>
+        </section>
+
+    </main>
+
+    <script>
+        /* ----------------------------------------------------
+         * GAME DATABASE
+         * ---------------------------------------------------- */
+        const gameRounds = [
+            { tokens: ["星期六", "你", "做", "什么", "？"], pinyin: ["xīng qī liù", "nǐ", "zuò", "shén me", "？"], en: "What do you do on Saturday?", ar: "ماذا تفعل يوم السبت؟" },
+            { tokens: ["这", "是", "什么", "？"], pinyin: ["zhè", "shì", "shén me", "？"], en: "What is this?", ar: "ما هذا؟" },
+            { tokens: ["我", "叫", "哈娜", "。", "你", "呢", "？"], pinyin: ["wǒ", "jiào", "hā nà", "。", "nǐ", "ne", "？"], en: "My name is Hana. How about you?", ar: "اسمي هانا. ماذا عنك؟" },
+            { tokens: ["哈娜", "去", "公园", "。", "玛丽", "呢", "？"], pinyin: ["hā nà", "qù", "gōng yuán", "。", "mǎ lì", "ne", "？"], en: "Hana goes to the park. How about Mary?", ar: "هانا تذهب إلى الحديقة. ماذا عن ماري؟" },
+            { tokens: ["星期六", "我", "踢足球", "。", "你", "呢", "？"], pinyin: ["xīng qī liù", "wǒ", "tī zú qiú", "。", "nǐ", "ne", "？"], en: "On Saturday I play football. How about you?", ar: "يوم السبت ألعَب كرة القدم. ماذا عنك؟" }
+        ];
+
+        /* ----------------------------------------------------
+         * GAME STATE
+         * ---------------------------------------------------- */
+        let teamData = [
+            { name: "小组一", avatar: "🎋", score: 0, time: 0, tries: 0 },
+            { name: "小组二", avatar: "🥋", score: 0, time: 0, tries: 0 }
+        ];
+        let currentTeamIdx = 0;
+        let currentRoundIdx = 0;
+        let selectedWordIndices = [];
+        let shuffledWords = [];
+        let timerInterval = null;
+        let secondsElapsed = 0;
+
+        /* ----------------------------------------------------
+         * CORE FUNCTIONS
+         * ---------------------------------------------------- */
+
+        function startPK() {
+            document.getElementById('setupScreen').classList.add('hidden');
+            document.getElementById('gameArea').classList.remove('hidden');
+            document.getElementById('pkBadge').classList.remove('hidden');
+            document.getElementById('gameTimer').classList.remove('hidden');
+            initTeamTurn();
+        }
+
+        function initTeamTurn() {
+            currentRoundIdx = 0;
+            secondsElapsed = 0;
+            updateTeamUI();
+            loadRound(0);
+            startTimer();
+        }
+
+        function updateTeamUI() {
+            const team = teamData[currentTeamIdx];
+            document.body.className = currentTeamIdx === 0 ? "team1-active" : "team2-active";
+            document.getElementById('curTeamName').textContent = team.name;
+            document.getElementById('curTeamAvatar').textContent = team.avatar;
+            const indicator = document.getElementById('teamTurnIndicator');
+            indicator.style.borderColor = currentTeamIdx === 0 ? "#10b981" : "#ef4444";
+            indicator.style.backgroundColor = currentTeamIdx === 0 ? "#064e3b" : "#450a0a";
+        }
+
+        function loadRound(idx) {
+            currentRoundIdx = idx;
+            const round = gameRounds[idx];
+            document.getElementById('roundCount').textContent = idx + 1;
+            document.getElementById('hintEn').textContent = round.en;
+            document.getElementById('hintAr').textContent = round.ar;
+            
+            selectedWordIndices = [];
+            shuffledWords = round.tokens.map((t, i) => ({ text: t, pinyin: round.pinyin[i], originalIdx: i }))
+                                     .sort(() => Math.random() - 0.5);
+            
+            renderStones(round.tokens.length);
+            renderTiles();
+            updatePanda(0);
+        }
+
+        function renderStones(num) {
+            const river = document.getElementById('riverTrack');
+            river.innerHTML = '';
+            // Start stone
+            river.innerHTML += `<div class="w-10 h-10 rounded-full bg-slate-700 border-2 border-slate-500"></div>`;
+            for(let i=0; i<num; i++) {
+                river.innerHTML += `<div class="lotus-float w-12 h-12 rounded-full bg-teal-800 border-2 border-amber-400 flex items-center justify-center text-xl">🪷</div>`;
+            }
+            // End stone
+            river.innerHTML += `<div class="w-14 h-14 rounded-full bg-amber-500 border-2 border-white flex items-center justify-center shadow-lg">🎋</div>`;
+        }
+
+        function renderTiles() {
+            const pool = document.getElementById('wordPool');
+            const drop = document.getElementById('dropZone');
+            pool.innerHTML = '';
+            drop.innerHTML = '';
+
+            shuffledWords.forEach((word, poolIdx) => {
+                if(!selectedWordIndices.includes(poolIdx)) {
+                    pool.appendChild(createTile(word, () => selectWord(poolIdx)));
+                }
+            });
+
+            selectedWordIndices.forEach((poolIdx, orderIdx) => {
+                const word = shuffledWords[poolIdx];
+                drop.appendChild(createTile(word, () => deselectWord(orderIdx), true));
+            });
+        }
+
+        function createTile(word, onClick, isSelected=false) {
+            const btn = document.createElement('button');
+            btn.className = `word-tile flex flex-col items-center p-2 rounded-xl shadow-md border ${isSelected ? 'bg-amber-400 text-black border-yellow-200' : 'bg-emerald-800/80 text-white border-emerald-600'}`;
+            btn.innerHTML = `<span class="text-[9px] opacity-70">${word.pinyin}</span><span class="text-xl font-bold">${word.text}</span>`;
+            btn.onclick = onClick;
+            return btn;
+        }
+
+        function selectWord(idx) {
+            selectedWordIndices.push(idx);
+            renderTiles();
+            updatePanda(selectedWordIndices.length);
+            playSfx('hop');
+        }
+
+        function deselectWord(idx) {
+            selectedWordIndices.splice(idx, 1);
+            renderTiles();
+            updatePanda(selectedWordIndices.length);
+        }
+
+        function updatePanda(step) {
+            const panda = document.getElementById('pandaMascot');
+            const stones = document.getElementById('riverTrack').children;
+            const target = stones[step];
+            const riverRect = document.getElementById('riverTrack').parentElement.getBoundingClientRect();
+            const stoneRect = target.getBoundingClientRect();
+
+            panda.style.left = `${stoneRect.left - riverRect.left + (stoneRect.width/2) - 25}px`;
+            panda.style.top = `${stoneRect.top - riverRect.top - 30}px`;
+            
+            const emoji = document.getElementById('pandaEmoji');
+            emoji.classList.remove('animate-jump');
+            void emoji.offsetWidth;
+            emoji.classList.add('animate-jump');
+        }
+
+        function resetRound() {
+            selectedWordIndices = [];
+            renderTiles();
+            updatePanda(0);
+        }
+
+        function checkAnswer() {
+            const round = gameRounds[currentRoundIdx];
+            const userSentence = selectedWordIndices.map(i => shuffledWords[i].text).join('');
+            const correctSentence = round.tokens.join('');
+            
+            teamData[currentTeamIdx].tries++;
+
+            if(userSentence === correctSentence) {
+                playSfx('correct');
+                // Panda jump to victory stone
+                updatePanda(round.tokens.length + 1);
+                
+                setTimeout(() => {
+                    if(currentRoundIdx < gameRounds.length - 1) {
+                        loadRound(currentRoundIdx + 1);
+                    } else {
+                        finishTeamTurn();
+                    }
+                }, 1000);
+            } else {
+                playSfx('wrong');
+                document.getElementById('pandaBubble').textContent = "再想一想 Try again!";
+                setTimeout(() => document.getElementById('pandaBubble').innerHTML = `<ruby>加油<rt>jiā yóu</rt></ruby>!`, 1500);
+            }
+        }
+
+        function finishTeamTurn() {
+            clearInterval(timerInterval);
+            teamData[currentTeamIdx].time = secondsElapsed;
+            
+            if(currentTeamIdx === 0) {
+                showTransition("小组一已完成！", "请小组二准备好过江...", "📢");
+            } else {
+                calculateScores();
+                showFinalResults();
+            }
+        }
+
+        function showTransition(title, text, icon) {
+            document.getElementById('gameArea').classList.add('hidden');
+            document.getElementById('transitionScreen').classList.remove('hidden');
+            document.getElementById('transitionTitle').textContent = title;
+            document.getElementById('transitionText').textContent = text;
+            document.getElementById('transitionIcon').textContent = icon;
+        }
+
+        function nextTeamTurn() {
+            currentTeamIdx = 1;
+            document.getElementById('transitionScreen').classList.add('hidden');
+            document.getElementById('gameArea').classList.remove('hidden');
+            initTeamTurn();
+        }
+
+        function calculateScores() {
+            teamData.forEach(team => {
+                // Scoring logic: Starts from 1000
+                // - 20 points for each extra try
+                // - 5 points for each 10 seconds
+                let base = 1000;
+                let penaltyTry = (team.tries - 5) * 30; // 5 rounds should take 5 tries
+                let penaltyTime = (team.time / 10) * 5;
+                team.score = Math.floor(base - penaltyTry - penaltyTime);
+            });
+        }
+
+        function showFinalResults() {
+            document.getElementById('gameArea').classList.add('hidden');
+            document.getElementById('resultScreen').classList.remove('hidden');
+            document.getElementById('gameTimer').classList.add('hidden');
+
+            const t1 = teamData[0];
+            const t2 = teamData[1];
+
+            // Display Team 1
+            document.getElementById('resTime1').textContent = formatTime(t1.time);
+            document.getElementById('resTry1').textContent = t1.tries;
+            document.getElementById('resScore1').textContent = t1.score;
+
+            // Display Team 2
+            document.getElementById('resTime2').textContent = formatTime(t2.time);
+            document.getElementById('resTry2').textContent = t2.tries;
+            document.getElementById('resScore2').textContent = t2.score;
+
+            // Winner Logic
+            if(t1.score > t2.score) {
+                document.getElementById('winnerBadge1').classList.remove('hidden');
+                document.getElementById('cardTeam1').classList.add('scale-110', 'z-10', 'border-yellow-400');
+            } else if (t2.score > t1.score) {
+                document.getElementById('winnerBadge2').classList.remove('hidden');
+                document.getElementById('cardTeam2').classList.add('scale-110', 'z-10', 'border-yellow-400');
+            }
+        }
+
+        /* ----------------------------------------------------
+         * HELPERS
+         * ---------------------------------------------------- */
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                document.getElementById('timerVal').textContent = formatTime(secondsElapsed);
+            }, 1000);
+        }
+
+        function formatTime(s) {
+            const m = Math.floor(s/60).toString().padStart(2,'0');
+            const sec = (s%60).toString().padStart(2,'0');
+            return `${m}:${sec}`;
+        }
+
+        function playSfx(type) {
+            // Simplified web audio logic
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            
+            if(type === 'hop') {
+                osc.frequency.setValueAtTime(300, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.1);
+            } else if(type === 'correct') {
+                osc.frequency.setValueAtTime(523, ctx.currentTime);
+                osc.frequency.setValueAtTime(659, ctx.currentTime + 0.1);
+            } else if(type === 'wrong') {
+                osc.frequency.setValueAtTime(200, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(50, ctx.currentTime + 0.3);
+            }
+            
+            gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.4);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.4);
+        }
+
+        function playTTS() {
+            const text = gameRounds[currentRoundIdx].tokens.join('');
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = 'zh-CN';
+            u.rate = 0.8;
+            speechSynthesis.speak(u);
+        }
+    </script>
+</body>
+</html>
+
